@@ -1,6 +1,6 @@
 <?php
 
-namespace Abel\ApiProxy;
+namespace AbelHalo\ApiProxy;
 
 use Illuminate\Support\Facades\Facade as Base;
 
