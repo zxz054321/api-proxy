@@ -3,6 +3,8 @@
 namespace AbelHalo\ApiProxy;
 
 use GuzzleHttp\Client;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 
 class ApiProxy
@@ -15,11 +17,14 @@ class ApiProxy
      * @var Client
      */
     protected $client;
+    protected $baseUri;
     protected $returnAs;
     protected $options = [];
+    protected $log = false;
 
     public function __construct($baseUri)
     {
+        $this->baseUri  = $baseUri;
         $this->client   = new Client(['base_uri' => $baseUri]);
         $this->returnAs = static::RETURN_AS_JSON_RESPONSE;
     }
@@ -27,6 +32,8 @@ class ApiProxy
     public function authorizationHeader($value)
     {
         $this->options['headers']['Authorization'] = $value;
+
+        return $this;
     }
 
     public function get($uri, $parameters = [])
@@ -64,9 +71,40 @@ class ApiProxy
         return $this;
     }
 
+    public function enableLog()
+    {
+        $this->log = true;
+
+        return $this;
+    }
+
+    public function disableLog()
+    {
+        $this->log = false;
+
+        return $this;
+    }
+
+    public function logRequest($method, $uri, array $options = [])
+    {
+        static $logger = null;
+
+        if (!$logger) {
+            $logger  = new Logger('apiproxy');
+            $path    = storage_path('logs/apiproxy.log');
+            $handler = new StreamHandler($path, Logger::INFO, false);
+
+            $logger->pushHandler($handler);
+        }
+
+        return $logger->info("$method $this->baseUri $uri", $this->options($options));
+    }
+
     protected function request($method, $uri, array $options = [])
     {
-        return $this->client->request($method, $uri, array_merge($this->options, $options));
+        $this->logRequest($method, $uri, $options);
+
+        return $this->client->request($method, $uri, $this->options($options));
     }
 
     protected function respond(ResponseInterface $response)
@@ -88,5 +126,10 @@ class ApiProxy
     protected function decodeJsonData(ResponseInterface $response, $assoc = false)
     {
         return json_decode($response->getBody(), $assoc);
+    }
+
+    protected function options(array $options = [])
+    {
+        return array_merge($this->options, $options);
     }
 }
