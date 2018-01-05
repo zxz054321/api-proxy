@@ -21,5 +21,8 @@
         "psr-4": {
             "AbelHalo\\ApiProxy\\": "src/"
         }
+    },
+    "require-dev": {
+        "orchestra/testbench": "~3.0"
     }
 }
