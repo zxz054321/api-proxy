@@ -16,6 +16,7 @@ class ApiProxy
      */
     protected $client;
     protected $returnAs;
+    protected $options = [];
 
     public function __construct($baseUri)
     {
@@ -23,30 +24,35 @@ class ApiProxy
         $this->returnAs = static::RETURN_AS_JSON_RESPONSE;
     }
 
+    public function authorizationHeader($value)
+    {
+        $this->options['headers']['Authorization'] = $value;
+    }
+
     public function get($uri, $parameters = [])
     {
-        $response = $this->client->get($uri, ['query' => $parameters]);
+        $response = $this->request('GET', $uri, ['query' => $parameters]);
 
         return $this->respond($response);
     }
 
     public function post($uri, $data = [])
     {
-        $response = $this->client->post($uri, ['json' => $data]);
+        $response = $this->request('POST', $uri, ['json' => $data]);
 
         return $this->respond($response);
     }
 
     public function patch($uri, $data = [])
     {
-        $response = $this->client->patch($uri, ['json' => $data]);
+        $response = $this->request('PATCH', $uri, ['json' => $data]);
 
         return $this->respond($response);
     }
 
     public function delete($uri)
     {
-        $response = $this->client->delete($uri);
+        $response = $this->request('DELETE', $uri);
 
         return $this->respond($response);
     }
@@ -56,6 +62,11 @@ class ApiProxy
         $this->returnAs = $returnAs;
 
         return $this;
+    }
+
+    protected function request($method, $uri, array $options = [])
+    {
+        return $this->client->request($method, $uri, array_merge($this->options, $options));
     }
 
     protected function respond(ResponseInterface $response)
