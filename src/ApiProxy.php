@@ -22,7 +22,7 @@ class ApiProxy
     protected $options = [];
     protected $log = false;
 
-    public function __construct($baseUri)
+    public function __construct($baseUri = '')
     {
         $this->baseUri  = $baseUri;
         $this->client   = new Client(['base_uri' => $baseUri]);
