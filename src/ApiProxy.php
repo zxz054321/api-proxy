@@ -36,6 +36,13 @@ class ApiProxy
         return $this;
     }
 
+    public function headers($pairs)
+    {
+        $this->options['headers'] = array_merge($this->options['headers'] ?? [], $pairs);
+
+        return $this;
+    }
+
     public function get($uri, $parameters = [])
     {
         $response = $this->request('GET', $uri, ['query' => $parameters]);
@@ -45,7 +52,10 @@ class ApiProxy
 
     public function post($uri, $data = [])
     {
-        $response = $this->request('POST', $uri, ['json' => $data]);
+        $contentType = 'application/x-www-form-urlencoded' == array_get($this->options, 'headers.Content-Type')
+            ? 'form_params' : 'json';
+
+        $response = $this->request('POST', $uri, [$contentType => $data]);
 
         return $this->respond($response);
     }
