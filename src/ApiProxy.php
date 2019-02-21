@@ -3,6 +3,7 @@
 namespace AbelHalo\ApiProxy;
 
 use GuzzleHttp\Client;
+use Illuminate\Http\UploadedFile;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
@@ -56,6 +57,25 @@ class ApiProxy
             ? 'form_params' : 'json';
 
         $response = $this->request('POST', $uri, [$contentType => $data]);
+
+        return $this->respond($response);
+    }
+
+    public function postWithFiles(string $uri, array $data = [])
+    {
+        $data = collect($data)
+            ->map(function ($value, $key) {
+                return [
+                    'name'     => $key,
+                    'contents' => $value instanceof UploadedFile
+                        ? fopen($value->path(), 'r')
+                        : $value,
+                ];
+            })
+            ->values()
+            ->toArray();
+
+        $response = $this->request('POST', $uri, ['multipart' => $data]);
 
         return $this->respond($response);
     }
