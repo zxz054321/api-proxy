@@ -4,8 +4,6 @@ namespace AbelHalo\ApiProxy;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\UploadedFile;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 
 class ApiProxy
@@ -21,13 +19,14 @@ class ApiProxy
     protected $baseUri;
     protected $returnAs;
     protected $options = [];
-    protected $log = false;
+    protected $logger;
 
     public function __construct($baseUri = '')
     {
         $this->baseUri  = $baseUri;
         $this->client   = new Client(['base_uri' => $baseUri]);
         $this->returnAs = static::RETURN_AS_JSON_RESPONSE;
+        $this->logger   = new Logger();
     }
 
     public function authorizationHeader($value)
@@ -66,7 +65,7 @@ class ApiProxy
         $data = collect($data)
             ->map(function ($value, $key) {
                 return [
-                    'name'     => $key,
+                    'name' => $key,
                     'contents' => $value instanceof UploadedFile
                         ? fopen($value->path(), 'r')
                         : $value,
@@ -103,31 +102,21 @@ class ApiProxy
 
     public function enableLog()
     {
-        $this->log = true;
+        $this->logger->enable();
 
         return $this;
     }
 
     public function disableLog()
     {
-        $this->log = false;
+        $this->logger->disable();
 
         return $this;
     }
 
     public function logRequest($method, $uri, array $options = [])
     {
-        static $logger = null;
-
-        if (!$logger) {
-            $logger  = new Logger('apiproxy');
-            $path    = storage_path('logs/apiproxy.log');
-            $handler = new StreamHandler($path, Logger::INFO, false);
-
-            $logger->pushHandler($handler);
-        }
-
-        return $logger->info("$method $this->baseUri $uri", $this->options($options));
+        return $this->logger->logRequest($method, "$this->baseUri $uri", $this->options($options));
     }
 
     protected function request($method, $uri, array $options = [])
