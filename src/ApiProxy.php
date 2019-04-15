@@ -8,10 +8,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class ApiProxy
 {
-    public const RETURN_AS_JSON_RESPONSE = 'json';
-    public const RETURN_AS_ARRAY = 'array';
-    public const RETURN_AS_OBJECT = 'object';
-
     public $logger;
 
     /**
@@ -19,16 +15,15 @@ class ApiProxy
      */
     protected $client;
     protected $baseUri;
-    protected $returnAs;
+    protected $returnAs = 'json';
     protected $options = [];
 
     public function __construct($baseUri = '')
     {
         $this->logger = new RequestLogger;
 
-        $this->baseUri  = $baseUri;
-        $this->client   = new Client(['base_uri' => $baseUri]);
-        $this->returnAs = static::RETURN_AS_JSON_RESPONSE;
+        $this->baseUri = $baseUri;
+        $this->client  = new Client(['base_uri' => $baseUri]);
     }
 
     public function authorizationHeader($value)
@@ -95,7 +90,22 @@ class ApiProxy
         return $this->respond($response);
     }
 
-    public function setReturnAs($returnAs)
+    public function setReturnAsJsonResponse(): self
+    {
+        return $this->setReturnAs('json');
+    }
+
+    public function setReturnAsArray(): self
+    {
+        return $this->setReturnAs('array');
+    }
+
+    public function setReturnAsObject(): self
+    {
+        return $this->setReturnAs('object');
+    }
+
+    public function setReturnAs($returnAs): self
     {
         $this->returnAs = $returnAs;
 
@@ -111,11 +121,11 @@ class ApiProxy
 
     protected function respond(ResponseInterface $response)
     {
-        if (static::RETURN_AS_JSON_RESPONSE == $this->returnAs) {
+        if ('json' == $this->returnAs) {
             return $this->jsonResponse($response);
         }
 
-        return $this->decodeJsonData($response, static::RETURN_AS_ARRAY == $this->returnAs);
+        return $this->decodeJsonData($response, 'array' == $this->returnAs);
     }
 
     protected function jsonResponse(ResponseInterface $response)
