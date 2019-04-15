@@ -5,7 +5,7 @@ namespace AbelHalo\ApiProxy;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as MonologLogger;
 
-class Logger
+class RequestLogger
 {
     protected $logger;
     protected $switch = false;
@@ -20,13 +20,13 @@ class Logger
         $this->logger->pushHandler($handler);
     }
 
-    public function logRequest(string $method, string $uri, array $options = []): bool
+    public function log(string $method, string $uri, array $guzzleOptions = []): bool
     {
         if (!$this->switch) {
             return true;
         }
 
-        return $this->logger->debug("$method $uri", $options);
+        return $this->logger->debug("$method $uri", $guzzleOptions);
     }
 
     public function enable(): void

@@ -8,9 +8,11 @@ use Psr\Http\Message\ResponseInterface;
 
 class ApiProxy
 {
-    const RETURN_AS_JSON_RESPONSE = 'json';
-    const RETURN_AS_ARRAY = 'array';
-    const RETURN_AS_OBJECT = 'object';
+    public const RETURN_AS_JSON_RESPONSE = 'json';
+    public const RETURN_AS_ARRAY = 'array';
+    public const RETURN_AS_OBJECT = 'object';
+
+    public $logger;
 
     /**
      * @var Client
@@ -19,14 +21,14 @@ class ApiProxy
     protected $baseUri;
     protected $returnAs;
     protected $options = [];
-    protected $logger;
 
     public function __construct($baseUri = '')
     {
+        $this->logger = new RequestLogger;
+
         $this->baseUri  = $baseUri;
         $this->client   = new Client(['base_uri' => $baseUri]);
         $this->returnAs = static::RETURN_AS_JSON_RESPONSE;
-        $this->logger   = new Logger();
     }
 
     public function authorizationHeader($value)
@@ -100,28 +102,9 @@ class ApiProxy
         return $this;
     }
 
-    public function enableLog()
-    {
-        $this->logger->enable();
-
-        return $this;
-    }
-
-    public function disableLog()
-    {
-        $this->logger->disable();
-
-        return $this;
-    }
-
-    public function logRequest($method, $uri, array $options = [])
-    {
-        return $this->logger->logRequest($method, "$this->baseUri $uri", $this->options($options));
-    }
-
     protected function request($method, $uri, array $options = [])
     {
-        $this->logRequest($method, $uri, $options);
+        $this->logger->log($method, "$this->baseUri $uri", $this->options($options));
 
         return $this->client->request($method, $uri, $this->options($options));
     }
