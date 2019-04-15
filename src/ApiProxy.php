@@ -90,17 +90,17 @@ class ApiProxy
         return $this->respond($response);
     }
 
-    public function setReturnAsJsonResponse(): self
+    public function returnAsJsonResponse(): self
     {
         return $this->setReturnAs('json');
     }
 
-    public function setReturnAsArray(): self
+    public function returnAsArray(): self
     {
         return $this->setReturnAs('array');
     }
 
-    public function setReturnAsObject(): self
+    public function returnAsObject(): self
     {
         return $this->setReturnAs('object');
     }
