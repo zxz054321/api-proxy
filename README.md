@@ -10,7 +10,7 @@ A simple api proxy for Laravel.
 \ApiProxy
   //返回值类型：object / array / json
   ::setReturnAs('object')
-  //get / post / put / ...
+  //请求方法：get / post / put / ...
   ->post($url, $params);
 ```
 
