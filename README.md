@@ -8,9 +8,9 @@ A simple api proxy for Laravel.
 
 ```php
 \ApiProxy
-  //返回值类型：object / array / json
+  // 返回值类型：object / array / string / json
   ::setReturnAs('object')
-  //请求方法：get / post / put / ...
+  // 请求方法：get / post / put / ...
   ->post($url, $params);
 ```
 
