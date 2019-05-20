@@ -105,6 +105,11 @@ class ApiProxy
         return $this->setReturnAs('object');
     }
 
+    public function returnAsString(): self
+    {
+        return $this->setReturnAs('string');
+    }
+
     public function setReturnAs($returnAs): self
     {
         $this->returnAs = $returnAs;
@@ -123,6 +128,10 @@ class ApiProxy
     {
         if ('json' == $this->returnAs) {
             return $this->jsonResponse($response);
+        }
+
+        if ('string' == $this->returnAs) {
+            return (string) $response->getBody();
         }
 
         return $this->decodeJsonData($response, 'array' == $this->returnAs);
