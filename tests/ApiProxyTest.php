@@ -1,9 +1,8 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests;
 
 use AbelHalo\ApiProxy\ApiProxy;
-use Tests\TestCase;
 
 class ApiProxyTest extends TestCase
 {
@@ -18,7 +17,7 @@ class ApiProxyTest extends TestCase
 
         $this->proxy = new ApiProxy('https://www.baidu.com');
 
-        $this->proxy->enableLog();
+        $this->proxy->logger->enable();
     }
 
     public function testGet()
@@ -28,7 +27,7 @@ class ApiProxyTest extends TestCase
 
     public function testLogRequest()
     {
-        $this->assertTrue($this->proxy->logRequest('GET', '/baidu', [
+        $this->assertTrue($this->proxy->logger->log('GET', '/baidu', [
             'query' => ['wd' => 'api-proxy'],
         ]));
     }
