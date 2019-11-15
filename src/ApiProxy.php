@@ -3,8 +3,10 @@
 namespace AbelHalo\ApiProxy;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\UriResolver;
 use Illuminate\Http\UploadedFile;
 use Psr\Http\Message\ResponseInterface;
+use function GuzzleHttp\Psr7\uri_for;
 
 class ApiProxy
 {
@@ -117,9 +119,19 @@ class ApiProxy
         return $this;
     }
 
-    protected function request($method, $uri, array $options = [])
+    protected function request(string $method, string $uri, array $options = [])
     {
-        $this->logger->log($method, "$this->baseUri $uri", $this->options($options));
+        $uriForLogging = $uri;
+
+        // 拼接完整的 uri
+        if ($this->baseUri) {
+            $uriForLogging = UriResolver::resolve(
+                uri_for($this->baseUri),
+                uri_for($uri)
+            );
+        }
+
+        $this->logger->log($method, $uriForLogging, $this->options($options));
 
         return $this->client->request($method, $uri, $this->options($options));
     }

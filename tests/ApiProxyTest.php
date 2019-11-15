@@ -3,6 +3,7 @@
 namespace Tests;
 
 use AbelHalo\ApiProxy\ApiProxy;
+use Illuminate\Http\JsonResponse;
 
 class ApiProxyTest extends TestCase
 {
@@ -20,15 +21,10 @@ class ApiProxyTest extends TestCase
         $this->proxy->logger->enable();
     }
 
-    public function testGet()
+    public function test_get()
     {
-        $this->proxy->get('/baidu', ['wd' => 'api-proxy']);
-    }
-
-    public function testLogRequest()
-    {
-        $this->assertTrue($this->proxy->logger->log('GET', '/baidu', [
-            'query' => ['wd' => 'api-proxy'],
-        ]));
+        $this->assertInstanceOf(JsonResponse::class,
+            $this->proxy->get('/baidu', ['wd' => 'api-proxy'])
+        );
     }
 }
