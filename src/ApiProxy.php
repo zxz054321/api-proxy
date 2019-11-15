@@ -131,9 +131,18 @@ class ApiProxy
             );
         }
 
+        // 发出请求前日志
         $this->logger->log($method, $uriForLogging, $this->options($options));
 
-        return $this->client->request($method, $uri, $this->options($options));
+        $time1    = microtime(true);
+        $response = $this->client->request($method, $uri, $this->options($options));
+        $time2    = microtime(true);
+        $time     = intval(($time2 - $time1) * 1000);
+
+        // 收到响应后耗时日志
+        $this->logger->log($method, "(Finished in {$time}ms) $uriForLogging", $this->options($options));
+
+        return $response;
     }
 
     protected function respond(ResponseInterface $response)
