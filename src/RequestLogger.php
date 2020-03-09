@@ -2,7 +2,7 @@
 
 namespace AbelHalo\ApiProxy;
 
-use Monolog\Handler\StreamHandler;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger as MonologLogger;
 
 class RequestLogger
@@ -14,19 +14,19 @@ class RequestLogger
     {
         $this->logger = new MonologLogger('apiproxy');
 
-        $path    = storage_path('logs/apiproxy.log');
-        $handler = new StreamHandler($path, MonologLogger::DEBUG, false);
+        $path = storage_path('logs/apiproxy.log');
+        $handler = new RotatingFileHandler($path, 14, MonologLogger::DEBUG, false);
 
         $this->logger->pushHandler($handler);
     }
 
-    public function log(string $method, string $uri, array $guzzleOptions = []): bool
+    public function log(string $method, string $uri, array $guzzleOptions = []): void
     {
         if (!$this->switch) {
-            return true;
+            return;
         }
 
-        return $this->logger->debug("$method $uri", $guzzleOptions);
+        $this->logger->debug("$method $uri", $guzzleOptions);
     }
 
     public function enable(): void

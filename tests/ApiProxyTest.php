@@ -12,7 +12,7 @@ class ApiProxyTest extends TestCase
      */
     protected $proxy;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
