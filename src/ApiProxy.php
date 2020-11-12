@@ -5,6 +5,7 @@ namespace AbelHalo\ApiProxy;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\UriResolver;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Psr\Http\Message\ResponseInterface;
 use function GuzzleHttp\Psr7\uri_for;
 
@@ -51,7 +52,7 @@ class ApiProxy
 
     public function post($uri, $data = [])
     {
-        $contentType = 'application/x-www-form-urlencoded' == array_get($this->options, 'headers.Content-Type')
+        $contentType = 'application/x-www-form-urlencoded' == Arr::get($this->options, 'headers.Content-Type')
             ? 'form_params' : 'json';
 
         $response = $this->request('POST', $uri, [$contentType => $data]);
