@@ -64,12 +64,14 @@ class ApiProxy
     {
         $data = collect($data)
             ->map(function ($value, $key) {
-                return [
-                    'name' => $key,
-                    'contents' => $value instanceof UploadedFile
-                        ? fopen($value->path(), 'r')
-                        : $value,
-                ];
+                $datum = ['name' => $key, 'contents' => $value,];
+
+                if ($value instanceof UploadedFile) {
+                    $datum['contents'] = fopen($value->path(), 'r');
+                    $datum['filename'] = $value->getClientOriginalName();
+                }
+
+                return $datum;
             })
             ->values()
             ->toArray();
